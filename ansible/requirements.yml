@@ -1,0 +1,2 @@
+- src: https://github.com/pli01/ansible-role-systemd-service/archive/master.tar.gz
+  name: systemd-service

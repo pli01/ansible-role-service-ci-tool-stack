@@ -1,0 +1,2 @@
+[ci-tool-stack]
+localhost ansible_connection=local

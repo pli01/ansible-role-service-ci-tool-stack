@@ -1,0 +1,15 @@
+---
+
+ci_tool_stack_conf_dir: ""
+ci_tool_stack_docker_compose: ""
+ci_tool_stack_service_volume_dir: []
+ci_tool_stack_config_owner: ""
+ci_tool_stack_config_group: ""
+
+# Sample config
+#ci_tool_stack_conf_dir: "/etc/docker-compose/ci-tool-stack"
+#ci_tool_stack_docker_compose: "{{ ci_tool_stack_conf_dir }}/docker-compose.yml"
+#ci_tool_stack_service_volume_dir:
+#  - { dir: '/opt/gitlab', owner: '', group: '' }
+#  - { dir: '/opt/nexus-data', owner: 200, group: '' }
+#  - { dir: '/opt/jenkins', owner: 1000, group: '' }

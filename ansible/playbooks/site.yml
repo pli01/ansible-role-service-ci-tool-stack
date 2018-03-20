@@ -1,0 +1,12 @@
+- name: Apply role ci-tool-stack
+  gather_facts: false
+  hosts:
+    - ci-tool-stack
+  serial: '{{ serial|default("0") }}'
+  roles:
+    - role: ci-tool-stack
+      when: enable_ci_tool_stack | bool
+
+    - role: systemd-service
+      systemd_service: "{{ {} | combine (ci_tool_stack_systemd_service) }}"
+      when: enable_ci_tool_stack | bool

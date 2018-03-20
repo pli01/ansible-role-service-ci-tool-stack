@@ -1,0 +1,22 @@
+enable_ci_tool_stack: '{{ lookup("env","SERVICE_CI_TOOL_STACK_ENABLE") | default("false") }}'
+
+docker_compose_bin: "/usr/local/bin/docker-compose"
+docker_compose_args: "--no-ansi"
+docker_compose_cmd: "{{ docker_compose_bin }} {{ docker_compose_args }}"
+
+common_exec_start:
+  - "{{ docker_compose_cmd }} up -d"
+common_exec_start_pre:
+  - "-{{ docker_compose_cmd }} down"
+  - "-{{ docker_compose_cmd }} config -q"
+  - "-{{ docker_compose_cmd }} pull"
+  - "-{{ docker_compose_cmd }} images"
+common_exec_stop:
+  - "{{ docker_compose_cmd }} down"
+common_exec_reload:
+  - "{{ docker_compose_cmd }} pull --parallel"
+  - "{{ docker_compose_cmd }} up -d"
+common_environment:
+  - 'http_proxy="{{ lookup("env","http_proxy") | default("") }}"'
+  - 'https_proxy="{{ lookup("env","https_proxy") | default("") }}"'
+  - 'no_proxy="{{ lookup("env","no_proxy") | default("") }}"'

@@ -1,0 +1,17 @@
+env_file_system: "/DATA"
+ci_tool_stack_conf_dir: "{{ env_file_system }}/docker-compose/ci-tool-stack"
+ci_tool_stack_systemd_service:
+  ci_tool_stack:
+    description: 'ci-tool-stack'
+    working_directory: "{{ ci_tool_stack_conf_dir }}"
+    after: docker.service
+    requires: docker.service
+    type: oneshot
+    remain_after_exit: 'yes'
+    timeoutsec: 120
+    environment: "{{ common_environment }}"
+    exec_start_pre: "{{ common_exec_start_pre }}"
+    exec_start: "{{ common_exec_start }}"
+    exec_stop: "{{ common_exec_stop }}"
+    exec_reload: "{{ common_exec_reload }}"
+    wanted_by: multi-user.target
