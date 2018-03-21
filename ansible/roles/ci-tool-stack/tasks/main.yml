@@ -2,8 +2,8 @@
 - name: Ensure needed docker-compose config directory exist
   file:
     path: "{{ item }}"
-    owner: "{{ ci_tool_stack_config_owner_user | default ('root)}}"
-    group: "{{ ci_tool_stack_config_owner_group| default ('root)}}"
+    owner: "{{ ci_tool_stack_config_owner_user | default ('root')}}"
+    group: "{{ ci_tool_stack_config_owner_group| default ('root')}}"
     mode: "0750"
     state: directory
   with_items: "{{ ci_tool_stack_conf_dir }}"
