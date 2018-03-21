@@ -3,6 +3,8 @@ ci_tool_stack_conf_dir: "{{ env_file_system }}/docker-compose/ci-tool-stack"
 ci_tool_stack_systemd_service:
   ci_tool_stack:
     description: 'ci-tool-stack'
+    # Start the service on boot
+    enabled: Yes
     working_directory: "{{ ci_tool_stack_conf_dir }}"
     after: docker.service
     requires: docker.service
