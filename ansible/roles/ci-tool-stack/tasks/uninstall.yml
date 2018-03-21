@@ -1,0 +1,8 @@
+---
+- name: Remove needed docker-compose config directory exist
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items: 
+    - "{{ ci_tool_stack_docker_compose }}"
+    - "{{ ci_tool_stack_conf_dir }}"
