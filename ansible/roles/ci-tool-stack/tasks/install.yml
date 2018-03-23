@@ -17,8 +17,14 @@
     state: directory
   with_items: "{{ ci_tool_stack_service_volume_dir }}"
 
-- name: Ensure docker-compose for service is up to date
-  template:
-    src: ci-tool-stack/docker-compose.yml
+- name: Ensure docker-compose file for service is up to date
+  copy:
+    content: "{{ ci_tool_stack_services |to_nice_yaml}}"
     dest: "{{ item }}"
   with_items: "{{ ci_tool_stack_docker_compose }}"
+
+#- name: Ensure docker-compose for service is up to date
+#  template:
+#    src: ci-tool-stack/docker-compose.yml
+#    dest: "{{ item }}"
+#  with_items: "{{ ci_tool_stack_docker_compose }}"
