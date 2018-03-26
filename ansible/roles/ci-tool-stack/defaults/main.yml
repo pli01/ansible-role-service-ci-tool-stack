@@ -5,11 +5,23 @@ ci_tool_stack_docker_compose: ""
 ci_tool_stack_service_volume_dir: []
 ci_tool_stack_config_owner: ""
 ci_tool_stack_config_group: ""
+ci_tool_stack_config_env: []
+ci_tool_stack_services: ""
 
 # Sample config
 #ci_tool_stack_conf_dir: "/etc/docker-compose/ci-tool-stack"
 #ci_tool_stack_docker_compose: "{{ ci_tool_stack_conf_dir }}/docker-compose.yml"
+#ci_tool_stack_config_env:
+#  - { src: "../files/ansible-env.yaml", dest: "{{ ci_tool_stack_conf_dir }}/ansible-env.yaml" }
 #ci_tool_stack_service_volume_dir:
 #  - { dir: '/opt/gitlab', owner: '', group: '' }
 #  - { dir: '/opt/nexus-data', owner: 200, group: '' }
 #  - { dir: '/opt/jenkins', owner: 1000, group: '' }
+#ci_tool_stack_services:
+#  version: '3.0'
+#  services:
+#    front:
+#      image: nginx:latest
+#      ports:
+#      - 80:80
+#      restart: always
