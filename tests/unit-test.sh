@@ -1,8 +1,9 @@
 #!/bin/bash
 set -ex
 
-time ( cd $(dirname $0)/../ansible &&
-  ansible-lint playbooks/*.yml
+time ( cd $(dirname $0)/../ansible
+
+test -x "$(type -p ansible-lint)" && ansible-lint playbooks/*.yml
 
   echo "ansible syntax-check"
   ansible-playbook -i config -c local -l localhost \
