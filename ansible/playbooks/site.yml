@@ -32,11 +32,11 @@
       ci_tool_stack_docker_compose: "{{ ci_nexus_stack_docker_compose }}"
       ci_tool_stack_services: "{{ {} | combine (ci_nexus_stack_services) }}"
       ci_tool_stack_service_volume_dir : "{{ ci_nexus_stack_service_volume_dir }}"
-      when: enable_ci_tool_stack | bool
+      when: enable_ci_nexus_stack | bool
 
     - role: systemd-service
       systemd_service: "{{ {} | combine (ci_nexus_stack_systemd_service) }}"
-      when: enable_ci_tool_stack | bool
+      when: enable_ci_nexus_stack | bool
 
 - name: Apply role jenkins
   gather_facts: false
@@ -50,8 +50,8 @@
       ci_tool_stack_docker_compose: "{{ ci_jenkins_stack_docker_compose }}"
       ci_tool_stack_services: "{{ {} | combine (ci_jenkins_stack_services) }}"
       ci_tool_stack_service_volume_dir : "{{ ci_jenkins_stack_service_volume_dir }}"
-      when: enable_ci_tool_stack | bool
+      when: enable_ci_jenkins_stack | bool
 
     - role: systemd-service
       systemd_service: "{{ {} | combine (ci_jenkins_stack_systemd_service) }}"
-      when: enable_ci_tool_stack | bool
+      when: enable_ci_jenkins_stack | bool
