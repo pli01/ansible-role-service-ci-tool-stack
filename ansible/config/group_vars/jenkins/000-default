@@ -1,0 +1,80 @@
+env_file_system: "/DATA"
+ci_jenkins_stack_name: "ci-jenkins-stack"
+ci_jenkins_stack_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_jenkins_stack_name }}"
+ci_jenkins_stack_docker_compose: "{{ ci_jenkins_stack_conf_dir }}/docker-compose.yml"
+ci_jenkins_stack_service_volume_dir:
+  - { dir: '/opt/jenkins', owner: 1000, group: 'root' }
+#ci_jenkins_stack_config_env:
+#  - { src: "../files/ansible-env.yaml", dest: "{{ ci_jenkins_stack_conf_dir }}/ansible-env.yaml" }
+ci_jenkins_stack_systemd_service:
+  ci_jenkins_stack:
+    description: '{{ ci_jenkins_stack_name }}'
+    # Start the service on boot
+    enabled: Yes
+    working_directory: "{{ ci_jenkins_stack_conf_dir }}"
+    after: docker.service
+    requires: docker.service
+    type: oneshot
+    remain_after_exit: 'yes'
+    timeoutsec: 120
+    environment: "{{ common_environment }}"
+    exec_start_pre: "{{ common_exec_start_pre }}"
+    exec_start: "{{ common_exec_start }}"
+    exec_stop: "{{ common_exec_stop }}"
+    exec_reload: "{{ common_exec_reload }}"
+    wanted_by: multi-user.target
+ci_jenkins_stack_services:
+    version: '3'
+    networks:
+      prodnetwork:
+        driver: bridge
+    #  TODO: swarm mode
+    #    driver: overlay
+        driver_opts:
+          com.docker.network.driver.mtu: 1450
+    volumes:
+      jenkins-data:
+    services:
+#      front:
+#        image: ci-tool-stack/nginx:latest
+##        build:
+##          context: https://github.com/pli01/docker-nginx.git
+##          args:
+##            - http_proxy=$http_proxy
+##            - https_proxy=$https_proxy
+##            - no_proxy=$no_proxy
+#        restart: always
+#        depends_on:
+#          - jenkins
+#        ports:
+#          - "80:80"
+#        networks:
+#          prodnetwork:
+#            aliases:
+#              - front
+#        extra_hosts:
+#           - "gitlab:127.0.0.1"
+#           - "nexus:127.0.0.1"
+#
+      jenkins:
+        image: ci-tool-stack/jenkins:2.107.1
+#        build:
+#          context: https://github.com/pli01/docker-jenkins.git
+#          args:
+#            - http_proxy=$http_proxy
+#            - https_proxy=$https_proxy
+#            - no_proxy=$no_proxy
+        restart: always
+        ports:
+#          - "18080:8080"
+          - "8080:8080"
+        networks:
+          prodnetwork:
+            aliases:
+              - jenkins
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - /usr/bin/docker:/usr/bin/docker
+          - jenkins-data:/var/lib/jenkins/
+        environment:
+          - JENKINS_OPTS="--prefix=/jenkins"

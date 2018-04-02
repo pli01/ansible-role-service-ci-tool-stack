@@ -1,0 +1,14 @@
+[front:children]
+node0
+
+[service-config:children]
+node0
+
+[gitlab:children]
+node1
+
+[nexus:children]
+node2
+
+[jenkins:children]
+node3

@@ -1,3 +1,11 @@
+- name: Gather facts for all hosts
+  hosts: all
+  serial: '{{ serial|default("0") }}'
+  gather_facts: false
+  tasks:
+    - setup:
+  tags: always
+
 - name: Apply role ci-tool-stack
   gather_facts: false
   hosts:
@@ -10,4 +18,40 @@
 
     - role: systemd-service
       systemd_service: "{{ {} | combine (ci_tool_stack_systemd_service) }}"
+      when: enable_ci_tool_stack | bool
+
+- name: Apply role nexus
+  gather_facts: false
+  hosts:
+    - nexus
+  serial: '{{ serial|default("0") }}'
+  become: yes
+  roles:
+    - role: ci-tool-stack
+      ci_tool_stack_conf_dir: "{{ ci_nexus_stack_conf_dir }}"
+      ci_tool_stack_docker_compose: "{{ ci_nexus_stack_docker_compose }}"
+      ci_tool_stack_services: "{{ {} | combine (ci_nexus_stack_services) }}"
+      ci_tool_stack_service_volume_dir : "{{ ci_nexus_stack_service_volume_dir }}"
+      when: enable_ci_tool_stack | bool
+
+    - role: systemd-service
+      systemd_service: "{{ {} | combine (ci_nexus_stack_systemd_service) }}"
+      when: enable_ci_tool_stack | bool
+
+- name: Apply role jenkins
+  gather_facts: false
+  hosts:
+    - jenkins
+  serial: '{{ serial|default("0") }}'
+  become: yes
+  roles:
+    - role: ci-tool-stack
+      ci_tool_stack_conf_dir: "{{ ci_jenkins_stack_conf_dir }}"
+      ci_tool_stack_docker_compose: "{{ ci_jenkins_stack_docker_compose }}"
+      ci_tool_stack_services: "{{ {} | combine (ci_jenkins_stack_services) }}"
+      ci_tool_stack_service_volume_dir : "{{ ci_jenkins_stack_service_volume_dir }}"
+      when: enable_ci_tool_stack | bool
+
+    - role: systemd-service
+      systemd_service: "{{ {} | combine (ci_jenkins_stack_systemd_service) }}"
       when: enable_ci_tool_stack | bool

@@ -14,9 +14,9 @@ ci_tool_stack_services: ""
 #ci_tool_stack_config_env:
 #  - { src: "../files/ansible-env.yaml", dest: "{{ ci_tool_stack_conf_dir }}/ansible-env.yaml" }
 #ci_tool_stack_service_volume_dir:
-#  - { dir: '/opt/gitlab', owner: '', group: '' }
-#  - { dir: '/opt/nexus-data', owner: 200, group: '' }
-#  - { dir: '/opt/jenkins', owner: 1000, group: '' }
+#  - { dir: '/opt/gitlab', owner: 'root', group: 'root' }
+#  - { dir: '/opt/nexus-data', owner: 200, group: 'root' }
+#  - { dir: '/opt/jenkins', owner: 1000, group: 'root' }
 #ci_tool_stack_services:
 #  version: '3.0'
 #  services:
