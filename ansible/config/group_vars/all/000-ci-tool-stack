@@ -1,4 +1,5 @@
 enable_ci_tool_stack: '{{ lookup("env","SERVICE_CI_TOOL_STACK_ENABLE") | default("false") }}'
+enable_ci_gitlab_stack: '{{ lookup("env","SERVICE_CI_GITLAB_STACK_ENABLE") | default("false") }}'
 enable_ci_nexus_stack: '{{ lookup("env","SERVICE_CI_NEXUS_STACK_ENABLE") | default("false") }}'
 enable_ci_jenkins_stack: '{{ lookup("env","SERVICE_CI_JENKINS_STACK_ENABLE") | default("false") }}'
 

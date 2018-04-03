@@ -1,0 +1,95 @@
+env_file_system: "/DATA"
+ci_gitlab_stack_name: "ci-gitlab-stack"
+ci_gitlab_stack_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_gitlab_stack_name }}"
+ci_gitlab_stack_docker_compose: "{{ ci_gitlab_stack_conf_dir }}/docker-compose.yml"
+ci_gitlab_stack_service_volume_dir:
+  - { dir: '/opt/gitlab', owner: 'root', group: 'root' }
+#ci_gitlab_stack_config_env:
+#  - { src: "../files/ansible-env.yaml", dest: "{{ ci_gitlab_stack_conf_dir }}/ansible-env.yaml" }
+ci_gitlab_stack_systemd_service:
+  ci_gitlab_stack:
+    description: '{{ ci_gitlab_stack_name }}'
+    # Start the service on boot
+    enabled: Yes
+    working_directory: "{{ ci_gitlab_stack_conf_dir }}"
+    after: docker.service
+    requires: docker.service
+    type: oneshot
+    remain_after_exit: 'yes'
+    timeoutsec: 120
+    environment: "{{ common_environment }}"
+    exec_start_pre: "{{ common_exec_start_pre }}"
+    exec_start: "{{ common_exec_start }}"
+    exec_stop: "{{ common_exec_stop }}"
+    exec_reload: "{{ common_exec_reload }}"
+    wanted_by: multi-user.target
+ci_gitlab_stack_services:
+    version: '3'
+    networks:
+      prodnetwork:
+        driver: bridge
+    #  TODO: swarm mode
+    #    driver: overlay
+        driver_opts:
+          com.docker.network.driver.mtu: 1450
+    services:
+      front:
+        image: ci-tool-stack/nginx:latest
+#        build:
+#          context: https://github.com/pli01/docker-nginx.git
+#          args:
+#            - http_proxy=$http_proxy
+#            - https_proxy=$https_proxy
+#            - no_proxy=$no_proxy
+        restart: always
+        depends_on:
+          - gitlab
+        ports:
+          - "80:80"
+        networks:
+          prodnetwork:
+            aliases:
+              - front
+        extra_hosts:
+           - "nexus:{{ hostvars[groups['nexus'].0]['ansible_eth0']['ipv4']['address'] }}"
+           - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_eth0']['ipv4']['address'] }}"
+      gitlab:
+        image: ci-tool-stack/gitlab-ce:10.5.6-ce.0
+        build:
+          context: https://github.com/pli01/docker-gitlab-ce.git
+        restart: always
+        networks:
+          prodnetwork:
+            aliases:
+              - gitlab
+        environment:
+          GITLAB_ROOT_PASSWORD: mypassword
+          GITLAB_OMNIBUS_CONFIG: |
+            prometheus_monitoring['enable'] = false
+    ##        external_url 'http://mysite'
+    ##        gitlab_rails['gitlab_email_display_name'] = 'Gitlab'
+    ##        gitlab_rails['gitlab_email_from'] = 'noreply@forge.factory'
+    ##        gitlab_rails['ldap_allow_username_or_email_login'] = true
+    ##        gitlab_rails['ldap_base'] = 'ou=People,dc=org'
+    ##        gitlab_rails['ldap_bind_dn'] = 'cn=admin,ou=Meta,dc=org'
+    ##        gitlab_rails['ldap_enabled'] = true
+    ##        gitlab_rails['ldap_host'] = 'ldaphost'
+    ##        gitlab_rails['ldap_method'] = 'plain'
+    ##        gitlab_rails['ldap_password'] = 'cloud'
+    ##        gitlab_rails['ldap_port'] = '389'
+    ##        gitlab_rails['ldap_uid'] = 'uid'
+    ##        gitlab_rails['time_zone'] = 'Europe/Paris'
+    ##        # deprecated
+    ##        gitlab_rails['gravatar_enabled'] = false
+    ##        gitlab_rails['gitlab_signup_enabled'] = false
+    ##        gitlab_rails['gitlab_signin_enabled'] = false
+    ##        # external_url 'https://gitlab.example.com'
+    ##        # Add any other gitlab.rb configuration here, each on its own line
+        ports:
+          - "10080:80"
+          - "10443:443"
+          - "10022:22"
+        volumes:
+          - "{{ env_file_system }}/opt/gitlab/config:/etc/gitlab"
+          - "{{ env_file_system }}/opt/gitlab/logs:/var/log/gitlab"
+          - "{{ env_file_system }}/opt/gitlab/data:/var/opt/gitlab"

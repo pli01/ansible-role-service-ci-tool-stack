@@ -4,6 +4,7 @@
 #
 [node1]
 #front-node-1
+#localhost ansible_connection=local
 #
 [node2]
 #front-node-2

@@ -35,26 +35,6 @@ ci_nexus_stack_services:
     volumes:
       nexus-data:
     services:
-      front:
-        image: ci-tool-stack/nginx:latest
-#        build:
-#          context: https://github.com/pli01/docker-nginx.git
-#          args:
-#            - http_proxy=$http_proxy
-#            - https_proxy=$https_proxy
-#            - no_proxy=$no_proxy
-        restart: always
-        depends_on:
-          - nexus
-        ports:
-          - "80:80"
-        networks:
-          prodnetwork:
-            aliases:
-              - front
-        extra_hosts:
-           - "gitlab:127.0.0.1"
-           - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_eth0']['ipv4']['address'] }}"
       nexus:
         image: ci-tool-stack/nexus3:latest
 #        build:
@@ -65,7 +45,7 @@ ci_nexus_stack_services:
 #            - no_proxy=$no_proxy
         restart: always
         ports:
-          - "18081:8081"
+          - "8081:8081"
           - "19081:19081"
         networks:
           prodnetwork:
