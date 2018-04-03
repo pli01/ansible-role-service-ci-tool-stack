@@ -3,7 +3,8 @@
   serial: '{{ serial|default("0") }}'
   gather_facts: false
   tasks:
-    - setup:
+    - name: collect facts
+      setup:
   tags: always
 
 - name: Apply role ci-tool-stack
