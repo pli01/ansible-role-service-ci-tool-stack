@@ -4,7 +4,7 @@ ci_jenkins_stack_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_jenkins_s
 ci_jenkins_stack_docker_compose: "{{ ci_jenkins_stack_conf_dir }}/docker-compose.yml"
 ci_jenkins_stack_service_volume_dir:
   - { dir: '/opt/jenkins', owner: 1000, group: 'root' }
-#ci_jenkins_stack_config_env:
+ci_jenkins_stack_config_env: []
 #  - { src: "../files/ansible-env.yaml", dest: "{{ ci_jenkins_stack_conf_dir }}/ansible-env.yaml" }
 ci_jenkins_stack_systemd_service:
   ci_jenkins_stack:

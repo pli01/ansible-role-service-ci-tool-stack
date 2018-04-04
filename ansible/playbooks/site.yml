@@ -33,6 +33,7 @@
       ci_tool_stack_docker_compose: "{{ ci_gitlab_stack_docker_compose }}"
       ci_tool_stack_services: "{{ {} | combine (ci_gitlab_stack_services) }}"
       ci_tool_stack_service_volume_dir : "{{ ci_gitlab_stack_service_volume_dir }}"
+      ci_tool_stack_config_env : "{{ ci_gitlab_stack_config_env }}"
       when: enable_ci_gitlab_stack | bool
 
     - role: systemd-service
@@ -51,6 +52,7 @@
       ci_tool_stack_docker_compose: "{{ ci_nexus_stack_docker_compose }}"
       ci_tool_stack_services: "{{ {} | combine (ci_nexus_stack_services) }}"
       ci_tool_stack_service_volume_dir : "{{ ci_nexus_stack_service_volume_dir }}"
+      ci_tool_stack_config_env : "{{ ci_nexus_stack_config_env }}"
       when: enable_ci_nexus_stack | bool
 
     - role: systemd-service
@@ -69,6 +71,7 @@
       ci_tool_stack_docker_compose: "{{ ci_jenkins_stack_docker_compose }}"
       ci_tool_stack_services: "{{ {} | combine (ci_jenkins_stack_services) }}"
       ci_tool_stack_service_volume_dir : "{{ ci_jenkins_stack_service_volume_dir }}"
+      ci_tool_stack_config_env : "{{ ci_jenkins_stack_config_env }}"
       when: enable_ci_jenkins_stack | bool
 
     - role: systemd-service
