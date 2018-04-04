@@ -1,6 +1,7 @@
 [node0]
 # These hostname must be resolvable from your deployment host
 #front-node-0
+#localhost ansible_connection=local
 #
 [node1]
 #front-node-1

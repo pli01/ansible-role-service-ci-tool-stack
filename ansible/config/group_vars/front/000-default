@@ -1,0 +1,75 @@
+env_file_system: "/DATA"
+ci_front_stack_name: "ci-front-stack"
+ci_front_stack_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_front_stack_name }}"
+ci_front_stack_docker_compose: "{{ ci_front_stack_conf_dir }}/docker-compose.yml"
+ci_front_stack_service_volume_dir: []
+ci_front_stack_config_env:
+  - { src: "../files/front/ci_80.conf", dest: "{{ ci_tool_stack_conf_dir }}/ci_80.conf" }
+#  - { src: "../files/ansible-env.yaml", dest: "{{ ci_tool_stack_conf_dir }}/ansible-env.yaml" }
+ci_front_stack_systemd_service:
+  ci_front_stack:
+    description: '{{ ci_front_stack_name }}'
+    # Start the service on boot
+    enabled: Yes
+    working_directory: "{{ ci_front_stack_conf_dir }}"
+    after: docker.service
+    requires: docker.service
+    type: oneshot
+    remain_after_exit: 'yes'
+    timeoutsec: 120
+    environment: "{{ common_environment }}"
+    exec_start_pre: "{{ common_exec_start_pre }}"
+    exec_start: "{{ common_exec_start }}"
+    exec_stop: "{{ common_exec_stop }}"
+    exec_reload: "{{ common_exec_reload }}"
+    wanted_by: multi-user.target
+ci_front_stack_services:
+  version: '3'
+  networks:
+    prodnetwork:
+      driver: bridge
+    #  TODO: swarm mode
+    #    driver: overlay
+      driver_opts:
+        com.docker.network.driver.mtu: '1450'
+  services:
+    front:
+      image: "ci-tool-stack/nginx:latest"
+      networks:
+        prodnetwork:
+          aliases:
+            - front
+      extra_hosts:
+           - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_eth0']['ipv4']['address'] }}"
+           - "nexus:{{ hostvars[groups['nexus'].0]['ansible_eth0']['ipv4']['address'] }}"
+           - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_eth0']['ipv4']['address'] }}"
+      ports:
+        - 80:80
+      restart: always
+      volumes:
+        - "{{ ci_front_stack_conf_dir }}/ci_80.conf:/etc/nginx/conf.d/default.conf:ro"
+    service-config:
+      image: "ci-tool-stack/service-config:latest"
+#     build:
+#          context: https://github.com/pli01/docker-service-config.git
+#          args:
+#            - http_proxy=$http_proxy
+#            - https_proxy=$https_proxy
+#            - no_proxy=$no_proxy
+#        restart: always
+      depends_on:
+        - front
+      networks:
+        prodnetwork:
+          aliases:
+            - service-config
+      extra_hosts:
+         - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_eth0']['ipv4']['address'] }}"
+         - "nexus:{{ hostvars[groups['nexus'].0]['ansible_eth0']['ipv4']['address'] }}"
+         - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_eth0']['ipv4']['address'] }}"
+      entrypoint: /docker-entrypoint.sh service-config
+      environment:
+        - http_proxy=$http_proxy
+        - https_proxy=$https_proxy
+        - no_proxy=$no_proxy,nexus
+        - nexus_url=http://nexus:8081/nexus
