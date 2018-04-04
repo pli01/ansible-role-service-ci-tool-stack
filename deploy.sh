@@ -3,6 +3,10 @@ set -e
 
 # Activate configuration playbook of following services
 export SERVICE_CI_TOOL_STACK_ENABLE=${SERVICE_CI_TOOL_STACK_ENABLE:-true}
+export SERVICE_CI_NEXUS_STACK_ENABLE=${SERVICE_CI_NEXUS_STACK_ENABLE:-true}
+export SERVICE_CI_JENKINS_STACK_ENABLE=${SERVICE_CI_JENKINS_STACK_ENABLE:-true}
+export SERVICE_CI_GITLAB_STACK_ENABLE=${SERVICE_CI_GITLAB_STACK_ENABLE:-true}
+
 export ANSIBLE_DEPLOY_LOCAL=${ANSIBLE_DEPLOY_LOCAL:-$(hostname -s)}
 
 echo "Configuration started"
