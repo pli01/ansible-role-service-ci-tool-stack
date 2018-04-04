@@ -4,8 +4,8 @@ ci_gitlab_stack_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_gitlab_sta
 ci_gitlab_stack_docker_compose: "{{ ci_gitlab_stack_conf_dir }}/docker-compose.yml"
 ci_gitlab_stack_service_volume_dir:
   - { dir: '/opt/gitlab', owner: 'root', group: 'root' }
-ci_gitlab_stack_config_env: []
-#  - { src: "../files/ansible-env.yaml", dest: "{{ ci_gitlab_stack_conf_dir }}/ansible-env.yaml" }
+ci_gitlab_stack_config_env:
+  - { src: "../files/front/gitlab_80.conf", dest: "{{ ci_tool_stack_conf_dir }}/gitlab_80.conf" }
 ci_gitlab_stack_systemd_service:
   ci_gitlab_stack:
     description: '{{ ci_gitlab_stack_name }}'
@@ -24,35 +24,31 @@ ci_gitlab_stack_systemd_service:
     exec_reload: "{{ common_exec_reload }}"
     wanted_by: multi-user.target
 ci_gitlab_stack_services:
-    version: '3'
-    networks:
-      prodnetwork:
-        driver: bridge
+  version: '3'
+  networks:
+    prodnetwork:
+      driver: bridge
     #  TODO: swarm mode
     #    driver: overlay
-        driver_opts:
-          com.docker.network.driver.mtu: 1450
-    services:
-      front:
-        image: ci-tool-stack/nginx:latest
-#        build:
-#          context: https://github.com/pli01/docker-nginx.git
-#          args:
-#            - http_proxy=$http_proxy
-#            - https_proxy=$https_proxy
-#            - no_proxy=$no_proxy
-        restart: always
-        depends_on:
-          - gitlab
-        ports:
-          - "80:80"
-        networks:
-          prodnetwork:
-            aliases:
-              - front
-        extra_hosts:
-           - "nexus:{{ hostvars[groups['nexus'].0]['ansible_eth0']['ipv4']['address'] }}"
-           - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_eth0']['ipv4']['address'] }}"
+      driver_opts:
+        com.docker.network.driver.mtu: 1450
+  services:
+    front:
+      image: "ci-tool-stack/nginx:latest"
+      depends_on:
+      - gitlab
+      networks:
+        prodnetwork:
+          aliases:
+            - front
+      ports:
+        - 80:80
+      restart: always
+      volumes:
+        - "{{ ci_gitlab_stack_conf_dir }}/gitlab_80.conf:/etc/nginx/conf.d/default.conf:ro"
+#      extra_hosts:
+#           - "nexus:{{ hostvars[groups['nexus'].0]['ansible_eth0']['ipv4']['address'] }}"
+#           - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_eth0']['ipv4']['address'] }}"
       gitlab:
         image: ci-tool-stack/gitlab-ce:10.5.6-ce.0
         build:
