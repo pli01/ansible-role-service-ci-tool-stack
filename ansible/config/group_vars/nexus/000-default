@@ -49,7 +49,7 @@ ci_nexus_stack_services:
       volumes:
         - "{{ ci_nexus_stack_conf_dir }}/nexus_80.conf:/etc/nginx/conf.d/default.conf:ro"
     nexus:
-        image: ci-tool-stack/nexus3:latest
+      image: ci-tool-stack/nexus3:latest
 #        build:
 #          context: https://github.com/pli01/docker-sonatype-nexus3.git
 #          args:
@@ -68,4 +68,4 @@ ci_nexus_stack_services:
         - nexus-data:/nexus-data
       environment:
         - NEXUS_CONTEXT=nexus
-    #      - INSTALL4J_ADD_VM_PARAMS="-Xms2g -Xmx2g -XX:MaxDirectMemorySize=3g -Djava.util.prefs.userRoot=${NEXUS_DATA}/javaprefs"
+#      - INSTALL4J_ADD_VM_PARAMS="-Xms2g -Xmx2g -XX:MaxDirectMemorySize=3g -Djava.util.prefs.userRoot=${NEXUS_DATA}/javaprefs"
