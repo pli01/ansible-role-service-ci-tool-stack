@@ -4,6 +4,15 @@ enable_ci_nexus_stack: '{{ lookup("env","SERVICE_CI_NEXUS_STACK_ENABLE") | defau
 enable_ci_jenkins_stack: '{{ lookup("env","SERVICE_CI_JENKINS_STACK_ENABLE") | default("false") }}'
 enable_ci_front_stack: '{{ lookup("env","SERVICE_CI_FRONT_STACK_ENABLE") | default("false") }}'
 
+
+registry_url: '{{ lookup("env","REGISTRY_URL") | default("") }}'
+repository_url: '{{ lookup("env","REPOSITORY_URL") | default("") }}'
+no_proxy: '{{ lookup("env","no_proxy") | default("") }}'
+http_proxy: '{{ lookup("env","http_proxy") | default("") }}'
+https_proxy: '{{ lookup("env","https_proxy") | default("") }}'
+
+env_file_system: "/DATA"
+
 docker_compose_bin: "/usr/local/bin/docker-compose"
 docker_compose_args: "--no-ansi"
 docker_compose_cmd: "{{ docker_compose_bin }} {{ docker_compose_args }}"

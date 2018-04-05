@@ -1,0 +1,9 @@
+# Define here your inventory
+[forge-node-0]
+front-node-0 ansible_ssh_host=192.168.1.1
+[forge-node-1]
+front-node-1 ansible_ssh_host=192.168.1.2
+[forge-node-2]
+front-node-2 ansible_ssh_host=192.168.1.3
+[forge-node-3]
+front-node-3 ansible_ssh_host=192.168.1.4

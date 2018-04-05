@@ -21,105 +21,107 @@ ci_tool_stack_systemd_service:
     exec_reload: "{{ common_exec_reload }}"
     wanted_by: multi-user.target
 ci_tool_stack_services:
-    version: '3'
-    networks:
-      prodnetwork:
-        driver: bridge
-    #  TODO: swarm mode
-    #    driver: overlay
-        driver_opts:
-          com.docker.network.driver.mtu: 1450
-    volumes:
-      nexus-data:
-      jenkins-data:
-    services:
-      service-config:
-        build:
-          context: https://github.com/pli01/docker-service-config.git
-          args:
-            - http_proxy=$http_proxy
-            - https_proxy=$https_proxy
-            - no_proxy=$no_proxy
-    #    restart: always
-        depends_on:
-          - front
-          - gitlab
-          - jenkins
-          - nexus
-        networks:
-          prodnetwork:
-            aliases:
-              - service-config
-        entrypoint: /docker-entrypoint.sh service-config
-        environment:
+  version: '3'
+  networks:
+    prodnetwork:
+      driver: bridge
+#  TODO: swarm mode
+#    driver: overlay
+      driver_opts:
+        com.docker.network.driver.mtu: 1450
+  volumes:
+    nexus-data:
+    jenkins-data:
+  services:
+    front:
+      image: "ci-tool-stack/nginx:latest"
+      build:
+        context: https://github.com/pli01/docker-nginx.git
+        args:
           - http_proxy=$http_proxy
           - https_proxy=$https_proxy
-          - no_proxy=$no_proxy,nexus
-          - nexus_url=http://nexus:8081/nexus
-      front:
-        build:
-          context: https://github.com/pli01/docker-nginx.git
-          args:
-            - http_proxy=$http_proxy
-            - https_proxy=$https_proxy
-            - no_proxy=$no_proxy
-        restart: always
-        depends_on:
-          - gitlab
-          - jenkins
-          - nexus
-        ports:
-          - "80:80"
-        networks:
-          prodnetwork:
-            aliases:
-              - front
-      nexus:
-        build:
-          context: https://github.com/pli01/docker-sonatype-nexus3.git
-          args:
-            - http_proxy=$http_proxy
-            - https_proxy=$https_proxy
-            - no_proxy=$no_proxy
-        restart: always
-        ports:
-          - "18081:8081"
-          - "19081:19081"
-        networks:
-          prodnetwork:
-            aliases:
-              - nexus
-        volumes:
-          - nexus-data:/nexus-data
-        environment:
-          - NEXUS_CONTEXT=nexus
-    #      - INSTALL4J_ADD_VM_PARAMS="-Xms2g -Xmx2g -XX:MaxDirectMemorySize=3g -Djava.util.prefs.userRoot=${NEXUS_DATA}/javaprefs"
-      jenkins:
-        build:
-          context: https://github.com/pli01/docker-jenkins.git
-          args:
-            - http_proxy=$http_proxy
-            - https_proxy=$https_proxy
-            - no_proxy=$no_proxy
-        restart: always
-        ports:
-          - "18080:8080"
-        networks:
-          prodnetwork:
-            aliases:
-              - jenkins
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock
-          - /usr/bin/docker:/usr/bin/docker
-          - jenkins-data:/var/lib/jenkins/
-        depends_on:
-          - nexus
-    #      - sonar
-        environment:
-          - JENKINS_OPTS="--prefix=/jenkins"
-          - NEXUS_PORT=8081
-          - SONAR_PORT=9000
-          - SONAR_DB_PORT=5432
+          - no_proxy=$no_proxy
+      restart: always
+      depends_on:
+        - gitlab
+        - jenkins
+        - nexus
+      ports:
+        - "80:80"
+      networks:
+        prodnetwork:
+          aliases:
+            - front
+    service-config:
+      image: "ci-tool-stack/service-config:latest"
+      build:
+        context: https://github.com/pli01/docker-service-config.git
+        args:
+          - http_proxy=$http_proxy
+          - https_proxy=$https_proxy
+          - no_proxy=$no_proxy
+    #    restart: always
+      depends_on:
+        - front
+        - gitlab
+        - jenkins
+        - nexus
+      networks:
+        prodnetwork:
+          aliases:
+            - service-config
+      entrypoint: /docker-entrypoint.sh service-config
+      environment:
+        - http_proxy=$http_proxy
+        - https_proxy=$https_proxy
+        - no_proxy=$no_proxy,nexus
+        - nexus_url=http://nexus:8081/nexus
+    nexus:
+      build:
+        context: https://github.com/pli01/docker-sonatype-nexus3.git
+        args:
+          - http_proxy=$http_proxy
+          - https_proxy=$https_proxy
+          - no_proxy=$no_proxy
+      restart: always
+      ports:
+        - "18081:8081"
+        - "19081:19081"
+      networks:
+        prodnetwork:
+          aliases:
+            - nexus
+      volumes:
+        - nexus-data:/nexus-data
+      environment:
+        - NEXUS_CONTEXT=nexus
+#      - INSTALL4J_ADD_VM_PARAMS="-Xms2g -Xmx2g -XX:MaxDirectMemorySize=3g -Djava.util.prefs.userRoot=${NEXUS_DATA}/javaprefs"
+    jenkins:
+      build:
+        context: https://github.com/pli01/docker-jenkins.git
+        args:
+          - http_proxy=$http_proxy
+          - https_proxy=$https_proxy
+          - no_proxy=$no_proxy
+      restart: always
+      ports:
+        - "18080:8080"
+      networks:
+        prodnetwork:
+          aliases:
+            - jenkins
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /usr/bin/docker:/usr/bin/docker
+        - jenkins-data:/var/lib/jenkins/
+      depends_on:
+        - nexus
+#      - sonar
+      environment:
+        - JENKINS_OPTS="--prefix=/jenkins"
+        - NEXUS_PORT=8081
+        - SONAR_PORT=9000
+        - SONAR_DB_PORT=5432
     #  sonardb:
     #    networks:
     #      - prodnetwork
@@ -148,14 +150,14 @@ ci_tool_stack_services:
     ##########################################################################################
     # DISABLED: GitLab takes too much memory and CPU. Demo uses GitHub repositories instead.
     #
-      gitlab:
-        build:
-          context: https://github.com/pli01/docker-gitlab-ce.git
-        restart: always
-        networks:
-          prodnetwork:
-            aliases:
-              - gitlab
+    gitlab:
+      build:
+        context: https://github.com/pli01/docker-gitlab-ce.git
+      restart: always
+      networks:
+        prodnetwork:
+          aliases:
+            - gitlab
     #    environment:
     ##      GITLAB_ROOT_PASSWORD: mypassword
     ##      GITLAB_OMNIBUS_CONFIG: |
@@ -178,11 +180,11 @@ ci_tool_stack_services:
     ##        gitlab_rails['gitlab_signin_enabled'] = false
     ##        # external_url 'https://gitlab.example.com'
     ##        # Add any other gitlab.rb configuration here, each on its own line
-        ports:
-          - "10080:80"
-          - "10443:443"
-          - "10022:22"
-        volumes:
-          - "{{ env_file_system }}/opt/gitlab/config:/etc/gitlab"
-          - "{{ env_file_system }}/opt/gitlab/logs:/var/log/gitlab"
-          - "{{ env_file_system }}/opt/gitlab/data:/var/opt/gitlab"
+      ports:
+        - "10080:80"
+        - "10443:443"
+        - "10022:22"
+      volumes:
+        - "{{ env_file_system }}/opt/gitlab/config:/etc/gitlab"
+        - "{{ env_file_system }}/opt/gitlab/logs:/var/log/gitlab"
+        - "{{ env_file_system }}/opt/gitlab/data:/var/opt/gitlab"

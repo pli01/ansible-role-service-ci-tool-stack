@@ -1,3 +1,4 @@
+# Assign here host in node group
 [node0]
 # These hostname must be resolvable from your deployment host
 #front-node-0

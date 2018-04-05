@@ -1,10 +1,9 @@
-env_file_system: "/DATA"
 ci_front_stack_name: "ci-front-stack"
 ci_front_stack_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_front_stack_name }}"
 ci_front_stack_docker_compose: "{{ ci_front_stack_conf_dir }}/docker-compose.yml"
 ci_front_stack_service_volume_dir: []
 ci_front_stack_config_env:
-  - { src: "../files/front/ci_80.conf", dest: "{{ ci_tool_stack_conf_dir }}/ci_80.conf" }
+  - { src: "../files/front/ci_80.conf", dest: "{{ ci_front_stack_conf_dir }}/ci_80.conf" }
 #  - { src: "../files/ansible-env.yaml", dest: "{{ ci_tool_stack_conf_dir }}/ansible-env.yaml" }
 ci_front_stack_systemd_service:
   ci_front_stack:
@@ -40,9 +39,9 @@ ci_front_stack_services:
           aliases:
             - front
       extra_hosts:
-           - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_eth0']['ipv4']['address'] }}"
-           - "nexus:{{ hostvars[groups['nexus'].0]['ansible_eth0']['ipv4']['address'] }}"
-           - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_eth0']['ipv4']['address'] }}"
+        - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
+        - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
+        - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
       ports:
         - 80:80
       restart: always
@@ -63,13 +62,22 @@ ci_front_stack_services:
         prodnetwork:
           aliases:
             - service-config
+#      volumes:
+#        - ./ansible-env.yaml:/opt/ansible/config/group_vars/all:ro
       extra_hosts:
-         - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_eth0']['ipv4']['address'] }}"
-         - "nexus:{{ hostvars[groups['nexus'].0]['ansible_eth0']['ipv4']['address'] }}"
-         - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_eth0']['ipv4']['address'] }}"
+        - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
+        - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
+        - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
       entrypoint: /docker-entrypoint.sh service-config
       environment:
-        - http_proxy=$http_proxy
-        - https_proxy=$https_proxy
-        - no_proxy=$no_proxy,nexus
-        - nexus_url=http://nexus:8081/nexus
+        http_proxy: $http_proxy
+        https_proxy: $https_proxy
+        no_proxy: $no_proxy,nexus
+#        http_proxy_host: localhost
+#        http_proxy_port: 3128
+#        LDAP_HOST: ldap-srv
+#        LDAP_PORT: 389
+#        LDAP_BIND_DN: cn=admin,dc=my,dc=site
+#        LDAP_BASE: ou=base,dc=my,dc=site
+#        LDAP_BASE_DN: ou=people
+#        LDAP_PASSWORD: s3cret
