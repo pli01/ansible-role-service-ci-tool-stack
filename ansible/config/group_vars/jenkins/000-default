@@ -63,6 +63,11 @@ ci_jenkins_stack_services:
         prodnetwork:
           aliases:
             - jenkins
+# if network host
+#      network_mode: "host"
+#      extra_hosts:
+#           - "front:10.0.2.15"
+#           - "jenkins:10.0.2.15"
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - /usr/bin/docker:/usr/bin/docker
