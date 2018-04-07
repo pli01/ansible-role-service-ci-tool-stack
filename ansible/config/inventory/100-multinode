@@ -5,13 +5,16 @@
 #localhost ansible_connection=local
 #
 [node1]
-#front-node-1
+#back-node-0
 #localhost ansible_connection=local
 #
 [node2]
-#front-node-2
+#back-node-1
 #localhost ansible_connection=local
 #
 [node3]
-#front-node-2
+#back-node-2
+#localhost ansible_connection=local
+[node4]
+#back-node-3
 #localhost ansible_connection=local

@@ -2,7 +2,7 @@ ci_gitlab_stack_name: "ci-gitlab-stack"
 ci_gitlab_stack_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_gitlab_stack_name }}"
 ci_gitlab_stack_docker_compose: "{{ ci_gitlab_stack_conf_dir }}/docker-compose.yml"
 ci_gitlab_stack_service_volume_dir:
-  - { dir: '/opt/gitlab', owner: 'root', group: 'root' }
+  - { dir: '{{ env_file_system }}/opt/gitlab', owner: 'root', group: 'root' }
 ci_gitlab_stack_config_env:
   - { src: "../files/front/gitlab_80.conf", dest: "{{ ci_tool_stack_conf_dir }}/gitlab_80.conf" }
 ci_gitlab_stack_systemd_service:

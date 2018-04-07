@@ -2,7 +2,7 @@ ci_nexus_stack_name: "ci-nexus-stack"
 ci_nexus_stack_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_nexus_stack_name }}"
 ci_nexus_stack_docker_compose: "{{ ci_nexus_stack_conf_dir }}/docker-compose.yml"
 ci_nexus_stack_service_volume_dir:
-  - { dir: '/opt/nexus-data', owner: 200, group: 'root' }
+  - { dir: '{{ env_file_system }}/opt/nexus-data', owner: 200, group: 'root' }
 ci_nexus_stack_config_env:
   - { src: "../files/front/nexus_80.conf", dest: "{{ ci_tool_stack_conf_dir }}/nexus_80.conf" }
 ci_nexus_stack_systemd_service:

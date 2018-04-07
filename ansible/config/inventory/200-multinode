@@ -12,3 +12,6 @@ node2
 
 [jenkins:children]
 node3
+
+[elk:children]
+node4

@@ -3,7 +3,7 @@ ci_jenkins_stack_name: "ci-jenkins-stack"
 ci_jenkins_stack_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_jenkins_stack_name }}"
 ci_jenkins_stack_docker_compose: "{{ ci_jenkins_stack_conf_dir }}/docker-compose.yml"
 ci_jenkins_stack_service_volume_dir:
-  - { dir: '/opt/jenkins', owner: 1000, group: 'root' }
+  - { dir: '{{ env_file_system }}/opt/jenkins', owner: 1000, group: 'root' }
 ci_jenkins_stack_config_env:
   - { src: "../files/front/jenkins_80.conf", dest: "{{ ci_tool_stack_conf_dir }}/jenkins_80.conf" }
 ci_jenkins_stack_systemd_service:
