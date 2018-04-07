@@ -3,6 +3,7 @@ enable_ci_gitlab_stack: '{{ lookup("env","SERVICE_CI_GITLAB_STACK_ENABLE") | def
 enable_ci_nexus_stack: '{{ lookup("env","SERVICE_CI_NEXUS_STACK_ENABLE") | default("false") }}'
 enable_ci_jenkins_stack: '{{ lookup("env","SERVICE_CI_JENKINS_STACK_ENABLE") | default("false") }}'
 enable_ci_front_stack: '{{ lookup("env","SERVICE_CI_FRONT_STACK_ENABLE") | default("false") }}'
+enable_ci_elk_stack: '{{ lookup("env","SERVICE_CI_ELK_STACK_ENABLE") | default("false") }}'
 
 
 registry_url: '{{ lookup("env","REGISTRY_URL") | default("") }}'
