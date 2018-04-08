@@ -1,3 +1,12 @@
+- name: Gather facts for all hosts
+  hosts: all
+  serial: '{{ serial|default("0") }}'
+  gather_facts: false
+  tasks:
+    - name: collect facts
+      setup:
+  tags: always
+
 - name: Uninstall role ci-tool-stack
   gather_facts: false
   hosts:
@@ -5,9 +14,61 @@
   serial: '{{ serial|default("0") }}'
   become: yes
   roles:
-    - role: ci-tool-stack
+    - role: systemd-service
+      systemd_service: "{{ {} | combine (ci_tool_stack_systemd_service) }}"
       when: enable_ci_tool_stack | bool
 
-#    - role: systemd-service
-#      systemd_service: "{{ {} | combine (ci_tool_stack_systemd_service) }}"
-#      when: enable_ci_tool_stack | bool
+- name: Uninstall role elk
+  gather_facts: false
+  hosts:
+    - elk
+  serial: '{{ serial|default("0") }}'
+  become: yes
+  roles:
+    - role: systemd-service
+      systemd_service: "{{ {} | combine (ci_elk_stack_systemd_service) }}"
+      when: enable_ci_elk_stack | bool
+
+- name: Uninstall role gitlab
+  gather_facts: false
+  hosts:
+    - gitlab
+  serial: '{{ serial|default("0") }}'
+  become: yes
+  roles:
+    - role: systemd-service
+      systemd_service: "{{ {} | combine (ci_gitlab_stack_systemd_service) }}"
+      when: enable_ci_gitlab_stack | bool
+
+- name: Uninstall role nexus
+  gather_facts: false
+  hosts:
+    - nexus
+  serial: '{{ serial|default("0") }}'
+  become: yes
+  roles:
+    - role: systemd-service
+      systemd_service: "{{ {} | combine (ci_nexus_stack_systemd_service) }}"
+      when: enable_ci_nexus_stack | bool
+
+- name: Uninstall role jenkins
+  gather_facts: false
+  hosts:
+    - jenkins
+  serial: '{{ serial|default("0") }}'
+  become: yes
+  roles:
+    - role: systemd-service
+      systemd_service: "{{ {} | combine (ci_jenkins_stack_systemd_service) }}"
+      when: enable_ci_jenkins_stack | bool
+
+- name: Uninstall role front
+  gather_facts: false
+  hosts:
+    - front
+  serial: '{{ serial|default("0") }}'
+  become: yes
+  roles:
+    - role: systemd-service
+      systemd_service: "{{ {} | combine (ci_front_stack_systemd_service) }}"
+      when: enable_ci_front_stack | bool
