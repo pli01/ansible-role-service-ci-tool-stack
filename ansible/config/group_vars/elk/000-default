@@ -55,7 +55,7 @@ ci_elk_stack_services:
         prodnetwork:
           aliases:
             - elk
-  
+
     elasticsearch:
       image: ci-tool-stack/elasticsearch:6.2.3
       restart: always
@@ -84,3 +84,5 @@ ci_elk_stack_services:
         prodnetwork:
           aliases:
             - elk
+      environment:
+        - SERVER_BASEPATH=/kibana

@@ -42,6 +42,7 @@ ci_front_stack_services:
         - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
         - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
         - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
+        - "kibana:{{ hostvars[groups['elk'].0]['ansible_ssh_host'] }}"
       ports:
         - 80:80
       restart: always
@@ -68,6 +69,7 @@ ci_front_stack_services:
         - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
         - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
         - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
+        - "kibana:{{ hostvars[groups['elk'].0]['ansible_ssh_host'] }}"
       entrypoint: /docker-entrypoint.sh service-config
       environment:
         http_proxy: $http_proxy
