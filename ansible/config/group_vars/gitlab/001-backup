@@ -9,6 +9,7 @@ ci_gitlab_backup_systemd_timer: {}
 #ci_gitlab_backup_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_gitlab_stack_name }}"
 #ci_gitlab_backup_config_env:
 #  - { src: "../files/gitlab/gitlab-backup.sh", dest: "{{ ci_gitlab_backup_conf_dir }}/gitlab-backup.sh" }
+#  - { src: "../files/gitlab/gitlab-restore.sh", dest: "{{ ci_gitlab_backup_conf_dir }}/gitlab-restore.sh" }
 #ci_gitlab_backup_systemd_service:
 #  ci-gitlab-backup:
 #    description: '{{ ci_gitlab_backup_name }}'
@@ -20,7 +21,7 @@ ci_gitlab_backup_systemd_timer: {}
 #    environment:
 #      - 'env_file_system="{{ env_file_system }}"'
 #    exec_start:
-#      - "{{ ci_gitlab_backup_conf_dir }}/gitlab-backup-small.sh"
+#      - "{{ ci_gitlab_backup_conf_dir }}/gitlab-backup.sh"
 #ci_gitlab_backup_systemd_timer:
 #  ci-gitlab-backup:
 #    description: '{{ ci_gitlab_backup_name }}'
