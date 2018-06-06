@@ -1,0 +1,31 @@
+# Gitlab backup disabled
+ci_gitlab_backup_conf_dir: []
+ci_gitlab_backup_config_env: []
+ci_gitlab_backup_systemd_service: {}
+ci_gitlab_backup_systemd_timer: {}
+
+# Gitlab backup enabled
+#ci_gitlab_backup_name: "ci-gitlab-backup"
+#ci_gitlab_backup_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_gitlab_stack_name }}"
+#ci_gitlab_backup_config_env:
+#  - { src: "../files/gitlab/gitlab-backup.sh", dest: "{{ ci_gitlab_backup_conf_dir }}/gitlab-backup.sh" }
+#ci_gitlab_backup_systemd_service:
+#  ci-gitlab-backup:
+#    description: '{{ ci_gitlab_backup_name }}'
+#    # Don't start the service on boot
+#    # enabled: False
+#    type: oneshot
+#    remain_after_exit: 'no'
+#    working_directory: "{{ ci_gitlab_backup_conf_dir }}"
+#    environment:
+#      - 'env_file_system="{{ env_file_system }}"'
+#    exec_start:
+#      - "{{ ci_gitlab_backup_conf_dir }}/gitlab-backup-small.sh"
+#ci_gitlab_backup_systemd_timer:
+#  ci-gitlab-backup:
+#    description: '{{ ci_gitlab_backup_name }}'
+#    # start the service on boot
+#    enabled: Yes
+#    persistent: 'true'
+#    on_calendar: daily
+#    wanted_by: timers.target
