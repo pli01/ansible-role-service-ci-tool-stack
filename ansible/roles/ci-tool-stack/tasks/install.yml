@@ -17,10 +17,11 @@
     state: directory
   with_items: "{{ ci_tool_stack_service_volume_dir }}"
 
-- name: Ensure extra conf file for service is up to date
+- name: Ensure extra conf file for service
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
+    mode: "{{ item.mode | default ('0644') }}"
   with_items: "{{ ci_tool_stack_config_env }}"
 
 - name: Ensure docker-compose file for service is up to date
