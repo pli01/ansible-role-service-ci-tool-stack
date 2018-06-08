@@ -7,7 +7,7 @@ ci_jenkins_stack_service_volume_dir:
 ci_jenkins_stack_config_env:
   - { src: "../files/front/jenkins_80.conf", dest: "{{ ci_tool_stack_conf_dir }}/jenkins_80.conf" }
 ci_jenkins_stack_systemd_service:
-  ci_jenkins_stack:
+  ci-jenkins-stack:
     description: '{{ ci_jenkins_stack_name }}'
     # Start the service on boot
     enabled: Yes
@@ -24,7 +24,10 @@ ci_jenkins_stack_systemd_service:
     exec_reload: "{{ common_exec_reload }}"
     wanted_by: multi-user.target
 ci_jenkins_stack_services:
-  version: '3'
+  version: '3.0'
+  volumes:
+    jenkins-data: {}
+## uncomment for network bridge
   networks:
     prodnetwork:
       driver: bridge
@@ -32,17 +35,26 @@ ci_jenkins_stack_services:
     #    driver: overlay
       driver_opts:
         com.docker.network.driver.mtu: 1450
-  volumes:
-    jenkins-data: {}
+## uncomment for network bridge
   services:
     front:
       image: "ci-tool-stack/nginx:latest"
       depends_on:
       - jenkins
+## uncomment for network host
+#      network_mode: "host"
+#      extra_hosts:
+#        - "front:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
+#        - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
+#        - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
+#        - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
+## uncomment for network host
+## uncomment for network bridge
       networks:
         prodnetwork:
           aliases:
             - front
+## uncomment for network bridge
       ports:
         - 80:80
       restart: always
@@ -58,18 +70,24 @@ ci_jenkins_stack_services:
 #            - no_proxy=$no_proxy
       restart: always
       ports:
-          - "18080:8080"
+        - 8080
+## uncomment for network host
+#      network_mode: "host"
+#      extra_hosts:
+#        - "front:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
+#        - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
+#        - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
+#        - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
+## uncomment for network host
+## uncomment for network bridge
       networks:
         prodnetwork:
           aliases:
             - jenkins
-# if network host
-#      network_mode: "host"
-#      extra_hosts:
-#           - "front:10.0.2.15"
-#           - "jenkins:10.0.2.15"
+## uncomment for network bridge
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
+        - "{{ env_file_system }}/opt/jenkins:/var/jenkins_home:rw"
         - /usr/bin/docker:/usr/bin/docker
         - jenkins-data:/var/lib/jenkins/
       environment:
