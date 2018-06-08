@@ -6,7 +6,7 @@ ci_nexus_stack_service_volume_dir:
 ci_nexus_stack_config_env:
   - { src: "../files/front/nexus_80.conf", dest: "{{ ci_tool_stack_conf_dir }}/nexus_80.conf" }
 ci_nexus_stack_systemd_service:
-  ci_nexus_stack:
+  ci-nexus-stack:
     description: '{{ ci_nexus_stack_name }}'
     # Start the service on boot
     enabled: Yes
@@ -26,22 +26,31 @@ ci_nexus_stack_services:
   version: '3.0'
   volumes:
     nexus-data: {}
+## uncomment for network bridge
   networks:
     prodnetwork:
       driver: bridge
     #  TODO: swarm mode
     #    driver: overlay
       driver_opts:
-        com.docker.network.driver.mtu: '1450'
+        com.docker.network.driver.mtu: 1450
+## uncomment for network bridge
   services:
     front:
       image: "ci-tool-stack/nginx:latest"
       depends_on:
       - nexus
+## uncomment for network host
+#      network_mode: "host"
+#      extra_hosts:
+#        - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
+## uncomment for network host
+## uncomment for network bridge
       networks:
         prodnetwork:
           aliases:
             - front
+## uncomment for network bridge
       ports:
         - 80:80
       restart: always
@@ -56,15 +65,22 @@ ci_nexus_stack_services:
 #            - https_proxy=$https_proxy
 #            - no_proxy=$no_proxy
       restart: always
+## uncomment for network host
+#      network_mode: "host"
+#      extra_hosts:
+#        - "front:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
+## uncomment for network host
+## uncomment for network bridge
       networks:
         prodnetwork:
           aliases:
             - nexus
+## uncomment for network bridge
       ports:
-        - "8081:8081"
-        - "19081:19081"
+        - 8081
+        - 19081
       volumes:
-        - nexus-data:/nexus-data
+        - "{{ env_file_system }}/opt/nexus-data:/nexus-data:rw"
       environment:
         - NEXUS_CONTEXT=nexus
 #      - INSTALL4J_ADD_VM_PARAMS="-Xms2g -Xmx2g -XX:MaxDirectMemorySize=3g -Djava.util.prefs.userRoot=${NEXUS_DATA}/javaprefs"
