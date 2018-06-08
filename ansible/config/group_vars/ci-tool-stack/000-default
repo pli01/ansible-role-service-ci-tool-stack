@@ -3,7 +3,7 @@ ci_tool_stack_docker_compose: "{{ ci_tool_stack_conf_dir }}/docker-compose.yml"
 #ci_tool_stack_config_env:
 #  - { src: "../files/ansible-env.yaml", dest: "{{ ci_tool_stack_conf_dir }}/ansible-env.yaml" }
 ci_tool_stack_systemd_service:
-  ci_tool_stack:
+  ci-tool-stack:
     description: 'ci-tool-stack'
     # Start the service on boot
     enabled: Yes
