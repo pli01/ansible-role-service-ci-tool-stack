@@ -8,8 +8,9 @@ ci_gitlab_backup_systemd_timer: {}
 #ci_gitlab_backup_name: "ci-gitlab-backup"
 #ci_gitlab_backup_conf_dir: "{{ env_file_system }}/docker-compose/{{ ci_gitlab_stack_name }}"
 #ci_gitlab_backup_config_env:
-#  - { src: "../files/gitlab/gitlab-backup.sh", dest: "{{ ci_gitlab_backup_conf_dir }}/gitlab-backup.sh" }
-#  - { src: "../files/gitlab/gitlab-restore.sh", dest: "{{ ci_gitlab_backup_conf_dir }}/gitlab-restore.sh" }
+#  - { src: "../files/gitlab/gitlab-backup.sh", dest: "{{ ci_gitlab_backup_conf_dir }}/gitlab-backup.sh", mode: '0755' }
+#  - { src: "../files/gitlab/gitlab-restore.sh", dest: "{{ ci_gitlab_backup_conf_dir }}/gitlab-restore.sh", mode: '0755' }
+#  - { src: "../files/gitlab/os-token-renew.sh", dest: "{{ ci_gitlab_backup_conf_dir }}/os-token-renew.sh", mode: '0755' }
 #ci_gitlab_backup_systemd_service:
 #  ci-gitlab-backup:
 #    description: '{{ ci_gitlab_backup_name }}'
@@ -22,6 +23,16 @@ ci_gitlab_backup_systemd_timer: {}
 #      - 'env_file_system="{{ env_file_system }}"'
 #    exec_start:
 #      - "{{ ci_gitlab_backup_conf_dir }}/gitlab-backup.sh"
+#  os-token-renew:
+#    description: 'os-token-renew'
+#    # Dont start the service on boot
+#    # enabled: False
+#    type: oneshot
+#    remain_after_exit: 'no'
+#    working_directory: "/root"
+#    exec_start:
+#      - "{{ ci_gitlab_backup_conf_dir }}/os-token-renew.sh"
+#
 #ci_gitlab_backup_systemd_timer:
 #  ci-gitlab-backup:
 #    description: '{{ ci_gitlab_backup_name }}'
@@ -29,4 +40,14 @@ ci_gitlab_backup_systemd_timer: {}
 #    enabled: Yes
 #    persistent: 'true'
 #    on_calendar: daily
+#    wanted_by: timers.target
+#  os-token-renew:
+#    description: 'os-token-renew'
+#    # start the service on boot
+#    enabled: Yes
+#    persistent: 'true'
+#    on_calendar: "*:30"
+#    #on_calendar: "*:0/5"
+#    #on_calendar: hourly
+#    #on_calendar: daily
 #    wanted_by: timers.target

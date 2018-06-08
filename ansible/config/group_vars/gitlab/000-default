@@ -6,7 +6,7 @@ ci_gitlab_stack_service_volume_dir:
 ci_gitlab_stack_config_env:
   - { src: "../files/front/gitlab_80.conf", dest: "{{ ci_tool_stack_conf_dir }}/gitlab_80.conf" }
 ci_gitlab_stack_systemd_service:
-  ci_gitlab_stack:
+  ci-gitlab-stack:
     description: '{{ ci_gitlab_stack_name }}'
     # Start the service on boot
     enabled: Yes
@@ -24,6 +24,7 @@ ci_gitlab_stack_systemd_service:
     wanted_by: multi-user.target
 ci_gitlab_stack_services:
   version: '3'
+## uncomment for network bridge
   networks:
     prodnetwork:
       driver: bridge
@@ -31,15 +32,28 @@ ci_gitlab_stack_services:
     #    driver: overlay
       driver_opts:
         com.docker.network.driver.mtu: 1450
+## uncomment for network bridge
   services:
     front:
       image: "ci-tool-stack/nginx:latest"
       depends_on:
         - gitlab
+## uncomment for network host
+#      network_mode: "host"
+## uncomment for network host
+## uncomment for network bridge
       networks:
         prodnetwork:
           aliases:
             - front
+## uncomment for network bridge
+## uncomment for network host
+#      extra_hosts:
+#        - "front:{{ hostvars[groups['front'].0]['ansible_ssh_host'] }}"
+#        - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
+#        - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
+#        - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
+## uncomment for network host
       ports:
         - 80:80
       restart: always
@@ -50,37 +64,60 @@ ci_gitlab_stack_services:
       build:
         context: https://github.com/pli01/docker-gitlab-ce.git
       restart: always
+## uncomment for network host
+#      network_mode: "host"
+#      extra_hosts:
+#        - "front:{{ hostvars[groups['front'].0]['ansible_ssh_host'] }}"
+#        - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
+#        - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
+#        - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
+## uncomment for network host
+## uncomment for network bridge
       networks:
         prodnetwork:
           aliases:
             - gitlab
+## uncomment for network bridge
       environment:
-        GITLAB_ROOT_PASSWORD: mypassword
         GITLAB_OMNIBUS_CONFIG: |
-          prometheus_monitoring['enable'] = false
-##        external_url 'http://mysite'
-##        gitlab_rails['gitlab_email_display_name'] = 'Gitlab'
-##        gitlab_rails['gitlab_email_from'] = 'noreply@forge.factory'
-##        gitlab_rails['ldap_allow_username_or_email_login'] = true
-##        gitlab_rails['ldap_base'] = 'ou=People,dc=org'
-##        gitlab_rails['ldap_bind_dn'] = 'cn=admin,ou=Meta,dc=org'
-##        gitlab_rails['ldap_enabled'] = true
-##        gitlab_rails['ldap_host'] = 'ldaphost'
-##        gitlab_rails['ldap_method'] = 'plain'
-##        gitlab_rails['ldap_password'] = 'cloud'
-##        gitlab_rails['ldap_port'] = '389'
-##        gitlab_rails['ldap_uid'] = 'uid'
-##        gitlab_rails['time_zone'] = 'Europe/Paris'
+##        external_url 'http://mysite';
+##        prometheus_monitoring['enable']=false;
+##        gitlab_rails['gitlab_email_display_name']='Gitlab';
+##        gitlab_rails['gitlab_email_from']='noreply@forge.factory';
+##        gitlab_rails['ldap_allow_username_or_email_login']=true;
+##        gitlab_rails['ldap_base']='ou=People,dc=org';
+##        gitlab_rails['ldap_bind_dn']='cn=admin,ou=Meta,dc=org';
+##        gitlab_rails['ldap_enabled']=true;
+##        gitlab_rails['ldap_host']='ldaphost';
+##        gitlab_rails['ldap_method']='plain';
+##        gitlab_rails['ldap_password']='cloud';
+##        gitlab_rails['ldap_port']='389';
+##        gitlab_rails['ldap_uid']='uid';
+##        gitlab_rails['time_zone']='Europe/Paris';
+##        gitlab_rails['smtp_enable']=true;
+##        gitlab_rails['smtp_address']='smtp.provider';
+##        gitlab_rails['smtp_port']=25;
+##        gitlab_rails['smtp_domain']='mydomain';
+##        gitlab_rails['smtp_tls']=false; gitlab_rails['smtp_openssl_verify_mode']='none';
+##        gitlab_rails['smtp_enable_starttls_auto']=false; gitlab_rails['smtp_ssl']=false;
+##        gitlab_rails['smtp_force_ssl']=false; gitlab_rails['gitlab_default_projects_features_builds']=false;
+##        gitlab_rails['gitlab_default_projects_features_container_registry']=false;
+##        gitlab_rails['env']={"http_proxy"=>"{{ http_proxy }}","https_proxy"=>"{{ http_proxy }}"};
+##        gitlab_rails['rack_attack_git_basic_auth']={'enabled'=>false,'ip_whitelist'=>['127.0.0.1','front']};
+##        unicorn['worker_processes']=5; unicorn['worker_timeout']=300; nginx['real_ip_header']='X-Real-IP';
+##        nginx['real_ip_recursive']='on'; nginx['keepalive_timeout']=300; prometheus_monitoring['enable']=false;
 ##        # deprecated
-##        gitlab_rails['gravatar_enabled'] = false
-##        gitlab_rails['gitlab_signup_enabled'] = false
-##        gitlab_rails['gitlab_signin_enabled'] = false
-##        # external_url 'https://gitlab.example.com'
+##        gitlab_rails['gravatar_enabled']=false;
+##        gitlab_rails['gitlab_signup_enabled']=false;
+##        gitlab_rails['gitlab_signin_enabled']=false;
 ##        # Add any other gitlab.rb configuration here, each on its own line
+
+        GITLAB_ROOT_PASSWORD: mypassword
+        GITLAB_UNICORN_MEMORY_MAX: '629145600'
       ports:
-        - "10080:80"
-        - "10443:443"
-        - "10022:22"
+        - "80"
+        - "443"
+        - "10022"
       volumes:
         - "{{ env_file_system }}/opt/gitlab/config:/etc/gitlab"
         - "{{ env_file_system }}/opt/gitlab/logs:/var/log/gitlab"
