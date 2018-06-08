@@ -6,7 +6,7 @@ ci_front_stack_config_env:
   - { src: "../files/front/ci_80.conf", dest: "{{ ci_front_stack_conf_dir }}/ci_80.conf" }
 #  - { src: "../files/ansible-env.yaml", dest: "{{ ci_tool_stack_conf_dir }}/ansible-env.yaml" }
 ci_front_stack_systemd_service:
-  ci_front_stack:
+  ci-front-stack:
     description: '{{ ci_front_stack_name }}'
     # Start the service on boot
     enabled: Yes
@@ -24,21 +24,31 @@ ci_front_stack_systemd_service:
     wanted_by: multi-user.target
 ci_front_stack_services:
   version: '3'
+## uncomment for network bridge
   networks:
     prodnetwork:
       driver: bridge
     #  TODO: swarm mode
     #    driver: overlay
       driver_opts:
-        com.docker.network.driver.mtu: '1450'
+        com.docker.network.driver.mtu: 1450
+## uncomment for network bridge
   services:
     front:
       image: "ci-tool-stack/nginx:latest"
+## uncomment for network host
+#      network_mode: "host"
+## uncomment for network host
+## uncomment for network bridge
       networks:
         prodnetwork:
           aliases:
             - front
+## uncomment for network bridge
       extra_hosts:
+## uncomment for network host
+#        - "front:{{ hostvars[groups['front'].0]['ansible_ssh_host'] }}"
+## uncomment for network host
         - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
         - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
         - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
@@ -59,21 +69,29 @@ ci_front_stack_services:
 #        restart: always
       depends_on:
         - front
+## uncomment for network bridge
+#      network_mode: "host"
+## uncomment for network bridge
+## uncomment for network host
       networks:
         prodnetwork:
           aliases:
             - service-config
-#      volumes:
-#        - ./ansible-env.yaml:/opt/ansible/config/group_vars/all:ro
+## uncomment for network host
       extra_hosts:
+## uncomment for network bridge
+#        - "front:{{ hostvars[groups['front'].0]['ansible_ssh_host'] }}"
+## uncomment for network bridge
         - "gitlab:{{ hostvars[groups['gitlab'].0]['ansible_ssh_host'] }}"
         - "nexus:{{ hostvars[groups['nexus'].0]['ansible_ssh_host'] }}"
         - "jenkins:{{ hostvars[groups['jenkins'].0]['ansible_ssh_host'] }}"
         - "kibana:{{ hostvars[groups['elk'].0]['ansible_ssh_host'] }}"
+      volumes:
+        - ./ansible-env.yaml:/opt/ansible/config/group_vars/all:ro
       entrypoint: /docker-entrypoint.sh service-config
       environment:
-        http_proxy: $http_proxy
-        https_proxy: $https_proxy
+        http_proxy: "{{ http_proxy }}"
+        https_proxy: "{{ https_proxy }}"
         no_proxy: $no_proxy,nexus
 #        http_proxy_host: localhost
 #        http_proxy_port: 3128
