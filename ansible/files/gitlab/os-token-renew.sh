@@ -34,7 +34,9 @@ else
 fi
 
 # get OS_PROJECT_ID from metadata api
-[ -z "$OS_PROJECT_ID" ] && export OS_PROJECT_ID=$(http_proxy="" https_proxy="" /usr/bin/curl --fail -s http://169.254.169.254/openstack/latest/meta_data.json | /usr/bin/jq  -r .project_id)
+meta_data_json=$(http_proxy="" https_proxy="" /usr/bin/curl --fail -s http://169.254.169.254/openstack/latest/meta_data.json )
+[ -z "$OS_TOKEN" ] && export OS_TOKEN="$(echo $meta_data_json | jq -r .meta.os_token)"
+[ -z "$OS_PROJECT_ID" ] && export OS_PROJECT_ID="$(echo $meta_data_json | jq -r .meta.os_project_id)"
 
 if [ -z "$OS_AUTH_URL" -o -z "$OS_TOKEN" -o -z "$OS_PROJECT_ID" ] ; then
    echo "ERROR: OS_AUTH_URL, OS_TOKEN or OS_PROJECT_ID empty"
@@ -44,11 +46,22 @@ fi
 [ -f $TOKEN_BODY ] && rm -rf $TOKEN_BODY
 [ -f $TOKEN_HEADER ] && rm -rf $TOKEN_HEADER
 
-echo "# new OS_TOKEN: get"
-JSON_TOKEN='{ "auth": { "identity": { "methods": ["token"], "token": { "id": "'$OS_TOKEN'" } }, "scope": { "project": { "id": "'$OS_PROJECT_ID'" } } } }'
+try=2
+until [ $try -eq 0 ] ; do
+  echo "# new OS_TOKEN ($try): get"
+  JSON_TOKEN='{ "auth": { "identity": { "methods": ["token"], "token": { "id": "'$OS_TOKEN'" } }, "scope": { "project": { "id": "'$OS_PROJECT_ID'" } } } }'
+  curl -s --fail -o $TOKEN_BODY -D $TOKEN_HEADER -X POST -H "Content-Type: application/json" -d "$JSON_TOKEN" $OS_AUTH_URL/auth/tokens 2>&1
+  ret=$?
+  if [ $ret -gt 0 ] || [ ! -s "$TOKEN_HEADER" ]; then
+    meta_data_json=$(http_proxy="" https_proxy="" /usr/bin/curl --fail -s http://169.254.169.254/openstack/latest/meta_data.json )
+    export OS_TOKEN="$(echo $meta_data_json | jq -r .meta.os_token)"
+    export OS_PROJECT_ID="$(echo $meta_data_json | jq -r .meta.os_project_id)"
+    try=$(( try -1 ))
+  else
+    try=0
+  fi
+done
 
-curl -s --fail -o $TOKEN_BODY -D $TOKEN_HEADER -X POST -H "Content-Type: application/json" -d "$JSON_TOKEN" $OS_AUTH_URL/auth/tokens 2>&1
-ret=$?
 if [ $ret -gt 0 ] || [ ! -s "$TOKEN_HEADER" ]; then
   [ -f $TOKEN_BODY ] && ls -alrt $TOKEN_BODY
   [ -f $TOKEN_HEADER ] && ls -alrt $TOKEN_HEADER
