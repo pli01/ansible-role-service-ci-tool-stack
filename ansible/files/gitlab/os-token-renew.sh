@@ -56,7 +56,7 @@ until [ $try -eq 0 ] ; do
     meta_data_json=$(http_proxy="" https_proxy="" /usr/bin/curl --fail -s http://169.254.169.254/openstack/latest/meta_data.json )
     export OS_TOKEN="$(echo $meta_data_json | jq -r .meta.os_token)"
     export OS_PROJECT_ID="$(echo $meta_data_json | jq -r .meta.os_project_id)"
-    try=$(( try -1 ))
+    try=$(( try - 1 ))
   else
     try=0
   fi
