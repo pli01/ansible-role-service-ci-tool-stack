@@ -1,3 +1,28 @@
+---
+- name: Wait for all hosts
+  hosts: bastion
+  serial: '{{ serial|default("0") }}'
+  gather_facts: false
+  tasks:
+    - name: facts
+      set_fact:
+        ansible_connection_is_local: '{{ lookup("env","ANSIBLE_CONNECTION")| default(local) }}'
+
+    - name: checking for port open
+      wait_for:
+        port: 22
+        host: "{{ item }}"
+        search_regex: OpenSSH
+        timeout: 5
+      delegate_to: localhost
+      with_items: "{{ groups['all'] }}"
+      register: port_check
+      until: port_check|success
+      delay: 1  # Check every 1 seconds. Adjust as you like.
+      retries: 120  # Retry up to 120 times. Adjust as needed.
+      failed_when: port_check | failed
+      when: ansible_connection_is_local != "local"
+
 - name: Gather facts for all hosts
   hosts: all
   serial: '{{ serial|default("0") }}'
@@ -6,6 +31,19 @@
     - name: collect facts
       setup:
   tags: always
+
+- name: Log into private registry and force re-authorization
+  hosts: all:!bastion
+  serial: '{{ serial|default("0") }}'
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Log into private registry and force re-authorization
+      docker_login:
+        registry: "{{ registry_url }}"
+        username: "{{ registry_username }}"
+        password: "{{ registry_password }}"
+        reauthorize: yes
 
 - name: Apply role ci-tool-stack
   gather_facts: false
@@ -133,5 +171,3 @@
     - role: systemd-service
       systemd_service: "{{ {} | combine (ci_front_stack_systemd_service) }}"
       when: enable_ci_front_stack | bool
-
-
