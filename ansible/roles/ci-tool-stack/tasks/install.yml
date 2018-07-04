@@ -23,12 +23,23 @@
     dest: "{{ item.dest }}"
     mode: "{{ item.mode | default ('0644') }}"
   with_items: "{{ ci_tool_stack_config_env }}"
+  register: extra_conf_docker_compose_result
 
 - name: Ensure docker-compose file for service is up to date
   copy:
     content: "{{ ci_tool_stack_services |to_nice_yaml}}"
     dest: "{{ item }}"
   with_items: "{{ ci_tool_stack_docker_compose }}"
+  register: docker_compose_result
+
+- name: Disable restart systemd service by default
+  set_fact:
+    restart_systemd_service: false
+
+- name: Trigger restart systemd service if docker-compose or extra conf changed
+  set_fact:
+    restart_systemd_service: true
+  when: ( docker_compose_result|changed or extra_conf_docker_compose_result|changed )
 
 #- name: Ensure docker-compose for service is up to date
 #  template:
