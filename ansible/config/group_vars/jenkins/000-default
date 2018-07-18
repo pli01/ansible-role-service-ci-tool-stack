@@ -38,7 +38,7 @@ ci_jenkins_stack_services:
 ## uncomment for network bridge
   services:
     front:
-      image: "ci-tool-stack/nginx:latest"
+      image: "{{ front_image_full }}"
       depends_on:
       - jenkins
 ## uncomment for network host
@@ -61,7 +61,7 @@ ci_jenkins_stack_services:
       volumes:
         - "{{ ci_jenkins_stack_conf_dir }}/jenkins_80.conf:/etc/nginx/conf.d/default.conf:ro"
     jenkins:
-      image: ci-tool-stack/jenkins:2.107.3
+      image: "{{ jenkins_image_full }}"
 #        build:
 #          context: https://github.com/pli01/docker-jenkins.git
 #          args:

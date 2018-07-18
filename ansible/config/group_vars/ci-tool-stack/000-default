@@ -33,7 +33,7 @@ ci_tool_stack_services:
     jenkins-data:
   services:
     front:
-      image: "ci-tool-stack/nginx:latest"
+      image: "{{ front_image_full }}"
       build:
         context: https://github.com/pli01/docker-nginx.git
         args:
@@ -52,7 +52,7 @@ ci_tool_stack_services:
           aliases:
             - front
     service-config:
-      image: "ci-tool-stack/service-config:latest"
+      image: "{{ service_config_image_full }}"
       build:
         context: https://github.com/pli01/docker-service-config.git
         args:

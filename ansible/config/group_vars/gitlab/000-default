@@ -35,7 +35,7 @@ ci_gitlab_stack_services:
 ## uncomment for network bridge
   services:
     front:
-      image: "ci-tool-stack/nginx:latest"
+      image: "{{ front_image_full }}"
       depends_on:
         - gitlab
 ## uncomment for network host
@@ -60,7 +60,7 @@ ci_gitlab_stack_services:
       volumes:
         - "{{ ci_gitlab_stack_conf_dir }}/gitlab_80.conf:/etc/nginx/conf.d/default.conf:ro"
     gitlab:
-      image: ci-tool-stack/gitlab-ce:10.5.6-ce.0
+      image: "{{ gitlab_image_full }}"
       build:
         context: https://github.com/pli01/docker-gitlab-ce.git
       restart: always

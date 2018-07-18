@@ -35,7 +35,7 @@ ci_front_stack_services:
 ## uncomment for network bridge
   services:
     front:
-      image: "ci-tool-stack/nginx:latest"
+      image: "{{ front_image_full }}"
 ## uncomment for network host
 #      network_mode: "host"
 ## uncomment for network host
@@ -59,7 +59,7 @@ ci_front_stack_services:
       volumes:
         - "{{ ci_front_stack_conf_dir }}/ci_80.conf:/etc/nginx/conf.d/default.conf:ro"
     service-config:
-      image: "ci-tool-stack/service-config:latest"
+      image: "{{ service_config_image_full }}"
 #     build:
 #          context: https://github.com/pli01/docker-service-config.git
 #          args:

@@ -37,7 +37,7 @@ ci_nexus_stack_services:
 ## uncomment for network bridge
   services:
     front:
-      image: "ci-tool-stack/nginx:latest"
+      image: "{{ front_image_full }}"
       depends_on:
       - nexus
 ## uncomment for network host
@@ -57,7 +57,7 @@ ci_nexus_stack_services:
       volumes:
         - "{{ ci_nexus_stack_conf_dir }}/nexus_80.conf:/etc/nginx/conf.d/default.conf:ro"
     nexus:
-      image: ci-tool-stack/nexus3:latest
+      image: "{{ nexus_image_full }}"
 #        build:
 #          context: https://github.com/pli01/docker-sonatype-nexus3.git
 #          args:
