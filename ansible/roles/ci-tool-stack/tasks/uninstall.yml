@@ -3,6 +3,6 @@
   file:
     path: "{{ item }}"
     state: absent
-  with_items: 
+  with_items:
     - "{{ ci_tool_stack_docker_compose }}"
     - "{{ ci_tool_stack_conf_dir }}"

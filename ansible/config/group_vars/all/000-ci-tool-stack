@@ -16,7 +16,7 @@ no_proxy: '{{ lookup("env","no_proxy") | default("") }}'
 http_proxy: '{{ lookup("env","http_proxy") | default("") }}'
 https_proxy: '{{ lookup("env","https_proxy") | default("") }}'
 
-env_file_system: '{{ lookup("env","env_file_system") | default("/DATA")
+env_file_system: '{{ lookup("env","env_file_system") | default("/DATA") }}'
 
 docker_compose_bin: "/usr/local/bin/docker-compose"
 docker_compose_args: "--no-ansi"

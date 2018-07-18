@@ -4,7 +4,8 @@ ci_front_stack_docker_compose: "{{ ci_front_stack_conf_dir }}/docker-compose.yml
 ci_front_stack_service_volume_dir: []
 ci_front_stack_config_env:
   - { src: "../files/front/ci_80.conf", dest: "{{ ci_front_stack_conf_dir }}/ci_80.conf" }
-#  - { src: "../files/ansible-env.yaml", dest: "{{ ci_tool_stack_conf_dir }}/ansible-env.yaml" }
+#  - { src: "../files/ansible-env.yaml", dest: "{{ ci_front_stack_conf_dir }}/ansible-env.yaml" }
+#  - { src: "../files/ansible-env-multinode.yaml", dest: "{{ ci_front_stack_conf_dir }}/ansible-env.yaml" }
 ci_front_stack_systemd_service:
   ci-front-stack:
     description: '{{ ci_front_stack_name }}'
