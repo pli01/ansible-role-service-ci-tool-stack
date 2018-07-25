@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# dynamic inventory from /etc/hosts
+#  match hostname with name "$stack*"
+#
+set -e
+function get_hosts_name() {
+[ -z "$stack" ] && return
+[ -f /etc/hosts ] && awk -v stack=$stack ' BEGIN { sep="" } $1 !~ /127./ && $2 ~ stack { a=a sep "\""$2"\"" ; sep=","} END { print a } ' /etc/hosts
+}
+
+function get_hosts_list() {
+#       "host1": { "ansible_ssh_host": "192.168.0.1"},
+[ -z "$stack" ] && return
+[ -f /etc/hosts ] && awk -v stack=$stack ' BEGIN { sep=""; } $1 !~ /127./ && $2 ~ stack { a=a sep "\""$2"\": {\"ansible_ssh_host\": \""$1"\"}"  ; sep=","} END { print a }' /etc/hosts
+}
+
+if [ "$1" == "--list" ] ; then
+cat <<EOF
+{
+  "bash_hosts": {
+        "hosts": [
+        $(get_hosts_name)
+        ],
+        "vars": {
+          "ansible_ssh_port": 22
+        }
+  },
+  "_meta": {
+        "hostvars": {
+        $( get_hosts_list )
+        }
+  }
+}
+EOF
+
+elif [ "$1" == "--host" ]; then
+  echo '{"_meta": {"hostvars": {}}}'
+else
+  echo "{ }"
+fi
+
