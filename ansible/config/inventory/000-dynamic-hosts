@@ -6,13 +6,13 @@
 set -e
 function get_hosts_name() {
 [ -z "$stack" ] && return
-[ -f /etc/hosts ] && awk -v stack=$stack ' BEGIN { sep="" } $1 !~ /127./ && $2 ~ stack { a=a sep "\""$2"\"" ; sep=","} END { print a } ' /etc/hosts
+getent hosts | awk -v stack=$stack ' BEGIN { sep="" } $1 !~ /127./ && $2 ~ stack { a=a sep "\""$2"\"" ; sep=","} END { print a } '
 }
 
 function get_hosts_list() {
 #       "host1": { "ansible_ssh_host": "192.168.0.1"},
 [ -z "$stack" ] && return
-[ -f /etc/hosts ] && awk -v stack=$stack ' BEGIN { sep=""; } $1 !~ /127./ && $2 ~ stack { a=a sep "\""$2"\": {\"ansible_ssh_host\": \""$1"\"}"  ; sep=","} END { print a }' /etc/hosts
+getent hosts | awk -v stack=$stack ' BEGIN { sep=""; } $1 !~ /127./ && $2 ~ stack { a=a sep "\""$2"\": {\"ansible_ssh_host\": \""$1"\"}"  ; sep=","} END { print a }'
 }
 
 if [ "$1" == "--list" ] ; then
