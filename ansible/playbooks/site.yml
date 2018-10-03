@@ -44,6 +44,11 @@
         username: "{{ registry_username }}"
         password: "{{ registry_password }}"
         reauthorize: yes
+      register: docker_login_status
+      until: docker_login_status is success
+      delay: 1  # Check every 1 seconds. Adjust as you like.
+      retries: 120  # Retry up to 120 times. Adjust as needed.
+      failed_when: docker_login_status is failed
 
 - name: Apply role ci-tool-stack
   gather_facts: false
